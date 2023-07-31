@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os/exec"
+	"strings"
 )
 
 /*
@@ -26,6 +27,5 @@ func exit(msg string) {
 
 func isOnMain() bool {
 	out, err := exec.Command("git", "branch", "--show-current").CombinedOutput()
-
-	return err != nil && string(out) != "main"
+	return err == nil && strings.TrimSpace(string(out)) == "main"
 }
