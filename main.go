@@ -189,9 +189,9 @@ updates:
       prefix: "chore(deps): "
     labels:
       - "dependencies"
-	groups:
-	  all:
-	    patterns: "*"
+    groups:
+      all:
+      patterns: ["*"]
 {{ if .typescript }}
   - package-ecosystem: "npm"
     directory: "{{ .typescript }}"
@@ -207,22 +207,22 @@ updates:
       - dependency-name: "constructs"
     labels:
       - "dependencies"
-	groups:
-	  all:
-	    patterns: "*"
+    groups:
+      all:
+      patterns: ["*"]
 {{ end }}
 {{ if .go }}
   - package-ecosystem: "go"
     directory: "{{ .go }}"
-	schedule:
+    schedule:
 	  interval: "weekly"
-	commit-message:
+    commit-message:
 	  prefix: "chore(deps): "
-	labels:
+    labels:
 	  - "dependencies"
-	groups:
-	  all:
-	    patterns: "*"
+    groups:
+      all:
+      patterns: ["*"]
 {{ end }}
 `
 
