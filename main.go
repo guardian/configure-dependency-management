@@ -90,6 +90,11 @@ func commit() error {
 }
 
 func createPR() error {
+	err := exec.Command("git", "push", "--set-upstream", "origin", "bot/configure-dependency-management").Run()
+	if err != nil {
+		return err
+	}
+
 	return exec.Command("gh", "pr", "create", "--head", "bot/configure-dependency-management", "--base", "main", "--title", "feat: add Dependabot config", "--body", "This PR was created by [a script](https://github.com/guardian/configure-dependency-management) to configure Dependabot. Please review and merge if appropriate.").Run()
 }
 
