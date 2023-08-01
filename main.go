@@ -47,14 +47,14 @@ func main() {
 	config := dependabotConfig(langs)
 	err := writeWithDir(dependabotFilePath, []byte(config), 0644)
 	check(err, "unable to write Dependabot config")
-
 	msg("Dependabot config written to " + dependabotFilePath)
 
 	err = commit()
 	check(err, "unable to commit Dependabot config")
+	msg("PR raised at ")
 
-	//err = createPR()
-	//check(err, "unable to create PR - but you can do this manually of course")
+	_, err = createPR()
+	check(err, "unable to create PR - but you can do this manually of course")
 
 	if langs["scala"] != "" {
 		msg("Please follow the instructions at https://github.com/guardian/scala-steward-public-repos to add Scala Steward to this repo. This is configured via the UI so cannot be done here.")
@@ -89,13 +89,17 @@ func commit() error {
 	return exec.Command("git", "commit", "-m", "feat: add Dependabot config").Run()
 }
 
-func createPR() error {
-	err := exec.Command("git", "push", "--set-upstream", "origin", "bot/configure-dependency-management").Run()
+func createPR() (string, error) {
+	err := exec.Command("git", "push", "--set-upstream", "origin", "bot/configure-dependency-management", "-f").Run()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return exec.Command("gh", "pr", "create", "--head", "bot/configure-dependency-management", "--base", "main", "--title", "feat: add Dependabot config", "--body", "This PR was created by [a script](https://github.com/guardian/configure-dependency-management) to configure Dependabot. Please review and merge if appropriate.").Run()
+	out, err := exec.Command("gh", "pr", "create", "--head", "bot/configure-dependency-management", "--base", "main", "--title", "feat: add Dependabot config", "--body", "This PR was created by [a script](https://github.com/guardian/configure-dependency-management) to configure Dependabot. Please review and merge if appropriate.").CombinedOutput()
+
+	println("pr out: " + string(out))
+
+	return string(out), err
 }
 
 func check(err error, msg string) {
