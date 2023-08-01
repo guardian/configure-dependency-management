@@ -13,15 +13,6 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-/*
-- Check if on `main` and exit with error if not
-- branch to bot/configure-dependency-management
-- if Go/Typescript/Rust, add the relevant Dependabot file
-- commit this
-- open a PR and return a link
-- if Scala, output instructions for how to add
-*/
-
 var dependabotFilePath = ".github/workflows/dependabot.yml"
 
 func main() {
@@ -51,13 +42,13 @@ func main() {
 
 	err = commit()
 	check(err, "unable to commit Dependabot config")
-	msg("PR raised at ")
 
-	_, err = createPR()
+	link, err := createPR()
 	check(err, "unable to create PR - but you can do this manually of course")
+	msg("PR raised at: " + link)
 
 	if langs["scala"] != "" {
-		msg("Please follow the instructions at https://github.com/guardian/scala-steward-public-repos to add Scala Steward to this repo. This is configured via the UI so cannot be done here.")
+		msg("Please follow the instructions at https://github.com/guardian/scala-steward-public-repos (or the private equivalent) to add Scala Steward to this repo. Unfortunately, this is configured via the UI so cannot be done here.")
 	}
 }
 
@@ -96,9 +87,6 @@ func createPR() (string, error) {
 	}
 
 	out, err := exec.Command("gh", "pr", "create", "--head", "bot/configure-dependency-management", "--base", "main", "--title", "feat: add Dependabot config", "--body", "This PR was created by [a script](https://github.com/guardian/configure-dependency-management) to configure Dependabot. Please review and merge if appropriate.").CombinedOutput()
-
-	println("pr out: " + string(out))
-
 	return string(out), err
 }
 
