@@ -191,7 +191,7 @@ updates:
       - "dependencies"
     groups:
       all:
-      patterns: ["*"]
+        patterns: ["*"]
 {{ if .typescript }}
   - package-ecosystem: "npm"
     directory: "{{ .typescript }}"
@@ -209,7 +209,7 @@ updates:
       - "dependencies"
     groups:
       all:
-      patterns: ["*"]
+        patterns: ["*"]
 {{ end }}
 {{ if .go }}
   - package-ecosystem: "go"
@@ -222,7 +222,7 @@ updates:
 	  - "dependencies"
     groups:
       all:
-      patterns: ["*"]
+        patterns: ["*"]
 {{ end }}
 `
 
