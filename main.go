@@ -13,7 +13,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-var dependabotFilePath = ".github/workflows/dependabot.yml"
+var dependabotFilePath = ".github/dependabot.yml"
 
 func main() {
 	if !isOnMain() {

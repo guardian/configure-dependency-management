@@ -20,6 +20,6 @@ To use, first ensure you have Go installed and also the Github CLI:
 
 Then install and run:
 
-    $ go install github.com/guardian/configure-dependency-management
+    $ go install github.com/guardian/configure-dependency-management@latest
     $ cd [your-project]
     $ configure-dependency-management
