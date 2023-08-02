@@ -12,27 +12,17 @@ import (
 	"strings"
 	"text/template"
 
-	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
 var dependabotFilePath = ".github/dependabot.yml"
 
 func main() {
-	if !isOnMain() {
-		exit("switch to main branch before running this script.")
-	}
-
-	if !ghCLIInstalled() {
-		exit("please install the GitHub CLI and authenticate before running this script.")
-	}
+	assert(isOnMain(), "switch to main branch before running this script.")
+	assert(ghCLIInstalled(), "please install the GitHub CLI and authenticate before running this script.")
 
 	langs := getLangs(os.DirFS("."))
-	msg("Detected the following languages: " + strings.Join(maps.Keys(langs), ", "))
-
-	if len(langs) == 0 {
-		exit("unable to configure as no languages detected.")
-	}
+	assert(len(langs) > 0, "unable to configure as no languages detected.")
 
 	if fileExists(dependabotFilePath) {
 		ok := askYN("existing Dependabot config found. Do you want to overwrite it?")
@@ -42,15 +32,14 @@ func main() {
 	}
 
 	config := dependabotConfig(langs)
-	err := writeWithDir(dependabotFilePath, []byte(config), 0644)
-	check(err, "unable to write Dependabot config")
+	check(writeWithDir(dependabotFilePath, []byte(config), 0644), "unable to write Dependabot config")
 	msg("Dependabot config written to " + dependabotFilePath)
 
-	err = commit()
-	check(err, "unable to commit Dependabot config")
+	check(commit(), "unable to commit Dependabot config")
 
 	link, err := createPR()
-	check(err, "unable to create PR - but you can do this manually of course")
+	check(err, "unable to create PR but config committed. Please create a PR manually.")
+
 	msg("PR raised at: " + link)
 
 	if langs["scala"] != "" {
@@ -94,6 +83,12 @@ func createPR() (string, error) {
 
 	out, err := exec.Command("gh", "pr", "create", "--head", "bot/configure-dependency-management", "--base", "main", "--title", "feat: add Dependabot config", "--body", "This PR was created by [a script](https://github.com/guardian/configure-dependency-management) to configure Dependabot. Please review and merge if appropriate.").CombinedOutput()
 	return string(out), err
+}
+
+func assert(condition bool, msg string) {
+	if !condition {
+		exit(msg)
+	}
 }
 
 func check(err error, msg string) {
