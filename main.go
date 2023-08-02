@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io/fs"
 	"log"
@@ -21,10 +22,13 @@ func main() {
 	assert(isOnMain(), "switch to main branch before running this script.")
 	assert(ghCLIInstalled(), "please install the GitHub CLI and authenticate before running this script.")
 
+	dryRun := flag.Bool("dry-run", false, "When set, will output the config to stdout instead of writing to the repo.")
+	flag.Parse()
+
 	langs := getLangs(os.DirFS("."))
 	assert(len(langs) > 0, "unable to configure as no languages detected.")
 
-	if fileExists(dependabotFilePath) {
+	if fileExists(dependabotFilePath) && !*dryRun {
 		ok := askYN("existing Dependabot config found. Do you want to overwrite it?")
 		if !ok {
 			exit("existing Dependabot config found. Please remove this before running to continue.")
@@ -32,6 +36,11 @@ func main() {
 	}
 
 	config := dependabotConfig(langs)
+	if *dryRun {
+		fmt.Println(config)
+		os.Exit(0)
+	}
+
 	check(writeWithDir(dependabotFilePath, []byte(config), 0644), "unable to write Dependabot config")
 	msg("Dependabot config written to " + dependabotFilePath)
 
