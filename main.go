@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -32,7 +33,10 @@ func main() {
 	}
 
 	if fileExists(dependabotFilePath) {
-		exit("existing Dependabot config found. Please remove this before running to continue.")
+		ok := askYN("existing Dependabot config found. Do you want to overwrite it?")
+		if !ok {
+			exit("existing Dependabot config found. Please remove this before running to continue.")
+		}
 	}
 
 	config := dependabotConfig(langs)
@@ -102,6 +106,20 @@ func msg(msg string) {
 
 func exit(msg string) {
 	log.Fatal("Error: " + msg)
+}
+
+func askYN(msg string) bool {
+	got := ""
+	fmt.Print(msg + " (y/n) ")
+	fmt.Scanln(&got)
+	switch got {
+	case "y":
+		return true
+	case "n":
+		return false
+	default:
+		return askYN("Please enter y or n")
+	}
 }
 
 func getLangs() map[string]string {
@@ -215,11 +233,11 @@ updates:
   - package-ecosystem: "go"
     directory: "{{ .go }}"
     schedule:
-	  interval: "weekly"
+      interval: "weekly"
     commit-message:
-	  prefix: "chore(deps): "
+      prefix: "chore(deps): "
     labels:
-	  - "dependencies"
+      - "dependencies"
     groups:
       all:
         patterns: ["*"]
