@@ -8,10 +8,12 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"sort"
 	"strings"
 	"text/template"
 
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 )
 
 var dependabotFilePath = ".github/dependabot.yml"
@@ -25,7 +27,7 @@ func main() {
 		exit("please install the GitHub CLI and authenticate before running this script.")
 	}
 
-	langs := getLangs()
+	langs := getLangs(os.DirFS("."))
 	msg("Detected the following languages: " + strings.Join(maps.Keys(langs), ", "))
 
 	if len(langs) == 0 {
@@ -122,7 +124,7 @@ func askYN(msg string) bool {
 	}
 }
 
-func getLangs() map[string]string {
+func getLangs(fSys fs.FS) map[string]string {
 	candidates := map[string]string{
 		"go":         "go.mod",
 		"typescript": "package.json",
@@ -130,12 +132,20 @@ func getLangs() map[string]string {
 		"scala":      "build.sbt",
 	}
 
+	ignoreDirs := []string{"node_modules"}
+
 	langs := map[string]string{}
 	for lang, file := range candidates {
-		filePath, exists := findFile(os.DirFS("."), file)
+		filePaths := findFiles(fSys, file, ignoreDirs)
 
-		if exists {
-			langs[lang] = dependabotRoot(filePath)
+		// If more than one file per language, we taken the shortest path as the
+		// root.
+		sort.Slice(filePaths, func(a, b int) bool {
+			return len(filePaths[a]) < len(filePaths[b])
+		})
+
+		if len(filePaths) > 0 {
+			langs[lang] = dependabotRoot(filePaths[0])
 		}
 	}
 
@@ -160,18 +170,22 @@ func fileExists(name string) bool {
 	return err == nil
 }
 
-func findFile(fsys fs.FS, name string) (string, bool) {
-	filePath := ""
-	found := false
+func findFiles(fsys fs.FS, name string, ignoreDirs []string) []string {
+	paths := []string{}
+
+	inIgnoreDir := func(path string) bool {
+		return slices.ContainsFunc(ignoreDirs, func(dir string) bool {
+			return strings.Contains(path, dir)
+		})
+	}
 
 	err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if d.Type().IsRegular() && d.Name() == name {
-			filePath = path + d.Name()
-			found = true
+		if d.Type().IsRegular() && d.Name() == name && !inIgnoreDir(path) {
+			paths = append(paths, path)
 		}
 
 		return nil
@@ -181,7 +195,7 @@ func findFile(fsys fs.FS, name string) (string, bool) {
 		log.Print("err: " + err.Error())
 	}
 
-	return filePath, found
+	return paths
 }
 
 func isOnMain() bool {
