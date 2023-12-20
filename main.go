@@ -247,8 +247,7 @@ updates:
     groups:
       all:
         patterns: ["*"]
-{{ end }}
-{{ if .go }}
+{{ end }}{{ if .go }}
   - package-ecosystem: "go"
     directory: "{{ .go }}"
     schedule:
@@ -260,8 +259,7 @@ updates:
     groups:
       all:
         patterns: ["*"]
-{{ end }}
-{{ if .python }}
+{{ end }}{{ if .python }}
   - package-ecosystem: "pip"
     directory: "{{ .python }}"
     schedule:
