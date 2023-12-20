@@ -248,7 +248,7 @@ updates:
         patterns: ["*"]
 {{ end }}
 {{ if .go }}
-  - package-ecosystem: "go"
+  - package-ecosystem: "gomod"
     directory: "{{ .go }}"
     schedule:
       interval: "weekly"
