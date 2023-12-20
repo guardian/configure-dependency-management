@@ -220,7 +220,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     commit-message:
       prefix: "chore(deps): "
     labels:
@@ -232,7 +232,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "{{ .typescript }}"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     commit-message:
       prefix: "chore(deps): "
     # The version of AWS CDK libraries must match those from @guardian/cdk.
@@ -251,7 +251,7 @@ updates:
   - package-ecosystem: "go"
     directory: "{{ .go }}"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     commit-message:
       prefix: "chore(deps): "
     labels:
