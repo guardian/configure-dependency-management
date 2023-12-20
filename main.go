@@ -134,6 +134,7 @@ func getLangs(fSys fs.FS) map[string]string {
 		"typescript": "package.json",
 		"rust":       "Cargo.toml",
 		"scala":      "build.sbt",
+		"python":     "requirements.txt",
 	}
 
 	ignoreDirs := []string{"node_modules"}
@@ -220,7 +221,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     commit-message:
       prefix: "chore(deps): "
     labels:
@@ -232,7 +233,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "{{ .typescript }}"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     commit-message:
       prefix: "chore(deps): "
     # The version of AWS CDK libraries must match those from @guardian/cdk.
@@ -246,12 +247,23 @@ updates:
     groups:
       all:
         patterns: ["*"]
-{{ end }}
-{{ if .go }}
+{{ end }}{{ if .go }}
   - package-ecosystem: "gomod"
     directory: "{{ .go }}"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    commit-message:
+      prefix: "chore(deps): "
+    labels:
+      - "dependencies"
+    groups:
+      all:
+        patterns: ["*"]
+{{ end }}{{ if .python }}
+  - package-ecosystem: "pip"
+    directory: "{{ .python }}"
+    schedule:
+      interval: "monthly"
     commit-message:
       prefix: "chore(deps): "
     labels:

@@ -9,8 +9,9 @@ It supports updates for:
 - Scala
 - Typescript
 - Go
+- Python
 
-The script adds some files, commits them, and raises a PR.
+The script adds a dependaboy.yml file, commits it, and raises a PR.
 
 To use, first ensure you have Go installed and also the Github CLI:
 
