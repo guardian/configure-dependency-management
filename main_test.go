@@ -8,16 +8,18 @@ import (
 
 func TestGetLangs(t *testing.T) {
 	testFs := fstest.MapFS{
-		"README.md":            {},
-		"foo/package.json":     {},
-		"foo/bar/package.json": {}, // We want to ignore this and use the top-level when both present.
-		"my-go-project/go.mod": {},
+		"README.md":                       {},
+		"foo/package.json":                {},
+		"foo/bar/package.json":            {}, // We want to ignore this and use the top-level when both present.
+		"my-go-project/go.mod":            {},
+		"python-project/requirements.txt": {},
 	}
 
 	got := getLangs(testFs)
 	want := map[string]string{
 		"go":         "/my-go-project",
 		"typescript": "/foo",
+		"python":     "/python-project",
 	}
 
 	if !reflect.DeepEqual(got, want) {

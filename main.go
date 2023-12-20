@@ -134,6 +134,7 @@ func getLangs(fSys fs.FS) map[string]string {
 		"typescript": "package.json",
 		"rust":       "Cargo.toml",
 		"scala":      "build.sbt",
+		"python":     "requirements.txt",
 	}
 
 	ignoreDirs := []string{"node_modules"}
@@ -250,6 +251,19 @@ updates:
 {{ if .go }}
   - package-ecosystem: "go"
     directory: "{{ .go }}"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore(deps): "
+    labels:
+      - "dependencies"
+    groups:
+      all:
+        patterns: ["*"]
+{{ end }}
+{{ if .python }}
+  - package-ecosystem: "pip"
+    directory: "{{ .python }}"
     schedule:
       interval: "monthly"
     commit-message:
