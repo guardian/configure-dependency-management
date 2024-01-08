@@ -11,7 +11,7 @@ It supports updates for:
 - Go
 - Python
 
-The script adds a dependaboy.yml file, commits it, and raises a PR.
+The script adds a dependabot.yml file, commits it, and raises a PR.
 
 To use, first ensure you have Go installed and also the Github CLI:
 
